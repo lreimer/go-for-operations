@@ -32,6 +32,13 @@ Make sure you have prepared your development environment properly.
 4. Building a Sidecar container
 5. Building a Kubernetes Operator in Go
 
+## References
+
+- https://talks.golang.org/2012/splash.article
+- https://learnxinyminutes.com/docs/go/
+- https://github.com/spf13/cobra/blob/master/cobra/README.md
+- https://github.com/operator-framework/getting-started
+
 ## Maintainer
 
 M.-Leander Reimer (@lreimer), <mario-leander.reimer@qaware.de>
