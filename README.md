@@ -38,6 +38,7 @@ Make sure you have prepared your development environment properly.
 - https://learnxinyminutes.com/docs/go/
 - https://github.com/spf13/cobra/blob/master/cobra/README.md
 - https://github.com/operator-framework/getting-started
+- https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md
 
 ## Maintainer
 
