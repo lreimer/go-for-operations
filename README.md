@@ -1,6 +1,6 @@
-# Go for Operations TechEx Day Workshop
+# Go for Operations Workshop
 
-Demo repository for my "Go for Operations" Technical Excellence Day Workshop.
+Demo repository for my "Go for Operations" workshop.
 
 Use the right tool (and language) for the job! This is the motto for this hands-on
 session. Go is a popular modern, simple, reliable and efficient programming language
