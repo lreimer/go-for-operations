@@ -1,0 +1,45 @@
+project_name: go-calc
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - 386
+      - amd64
+    ldflags: -s -w -X main.version={{.Version}}
+archives:
+  - name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}{{ if .Arm}}v{{ .Arm }}{{ end }}'
+    format_overrides:
+     - goos: windows
+       format: zip
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+dockers:
+  - image_templates:
+      - lreimer/go-calc:latest
+      - lreimer/go-calc:v{{ .Major }}
+      - lreimer/go-calc:{{ .Version }}
+    skip_push: true
+    dockerfile: Dockerfile_goreleaser
+    goos: linux
+    goarch: amd64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-SNAPSHOT"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

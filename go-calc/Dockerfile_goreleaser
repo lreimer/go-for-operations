@@ -1,0 +1,5 @@
+FROM gcr.io/distroless/static-debian10
+COPY go-calc /
+
+ENTRYPOINT ["/go-calc"]
+CMD ["version"]
