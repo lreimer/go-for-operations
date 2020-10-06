@@ -1,6 +1,4 @@
-# Getting to Know Go: Language Basics and Tooling
-
-## Writing Go Applications
+# Hello World in Go
 
 Issue the following commands on the command line terminal.
 ```bash
@@ -26,18 +24,11 @@ func main() {
 
 Save the file, open a terminal and build your first binary Go application.
 ```bash
+$ go run main.go
+
 $ go build
 $ go build -o hello-go main.go
+
+$ ./hello-go
 ```
-
-## Testing Go Applications
-
-
-## Building Go Applications
-
-### Using Makefiles
-
-### Using GoReleaser
-
-### Using Docker
 
