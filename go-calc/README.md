@@ -6,24 +6,82 @@ Issue the following commands on the command line terminal.
 ```bash
 $ go mod init github.com/lreimer/go-for-operations/go-calc
 $ touch main.go
+$ touch calc.go
 
-# open folder and `main.go` file in an IDE of your choice
+# open VS.code for editing the source files.
 $ code .
 ```
 
-Next, open the folder and `main.go` file in an IDE of your choice and
-add the following code snippet to the file.
+Open the `calc.go` file the your IDE and add the following code snippet to the file. 
 
 ```golang
 package main
 
-import "fmt"
+import "strconv"
 
-func main() {
+// Add two numbers represented as string
+func Add(a string, b string) int64 {
+	x, err := strconv.ParseInt(a, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	y, err := strconv.ParseInt(b, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	return x + y
 }
 ```
 
-Save the file, open a terminal and build your first binary Go application.
+Open the `main.go` file in your IDE and add the following code snippet to the file.
+
+```golang
+package main
+
+import (
+	"flag"
+	"fmt"
+	"os"
+)
+
+var version = ""
+var commit = ""
+
+func main() {
+	// add CLI subcommand and boolean flag
+	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
+	addEnabled := addCmd.Bool("enabled", true, "enabled")
+
+	if len(os.Args) < 2 {
+		illegalArguments()
+	}
+
+	// decide based on first argument
+	switch os.Args[1] {
+	case "add":
+		// parse the remaing arguments
+		addCmd.Parse(os.Args[2:])
+		if *addEnabled {
+			args := addCmd.Args()
+			result := Add(args[0], args[1])
+			fmt.Printf("%v + %v = %v\n", args[0], args[1], result)
+		}
+	case "version":
+		fmt.Printf("go-calc %v %v\n", version, commit)
+	default:
+		illegalArguments()
+	}
+}
+
+func illegalArguments() {
+	fmt.Println("Expected 'add' or 'version' subcommands.")
+	os.Exit(1)
+}
+```
+
+Now, build and run the application for the first time.
 
 ```bash
 $ go run main.go version
@@ -35,6 +93,8 @@ $ go build -o go-calc -ldflags="-s -w -X main.Version=v1.0.0"
 
 $ ./go-calc version
 ```
+
+Add another command to the CLI, for example to subtract or multiply two numbers.
 
 ## Testing Go Applications
 

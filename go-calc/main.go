@@ -10,6 +10,7 @@ var version = ""
 var commit = ""
 
 func main() {
+	// add CLI subcommand and boolean flag
 	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
 	addEnabled := addCmd.Bool("enabled", true, "enabled")
 
@@ -17,6 +18,7 @@ func main() {
 		illegalArguments()
 	}
 
+	// decide based on first argument
 	switch os.Args[1] {
 	case "add":
 		// parse the remaing arguments
