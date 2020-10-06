@@ -6,7 +6,8 @@ import (
 	"os"
 )
 
-var version = "SNAPSHOT"
+var version = ""
+var commit = ""
 
 func main() {
 	addCmd := flag.NewFlagSet("add", flag.ExitOnError)
@@ -26,7 +27,7 @@ func main() {
 			fmt.Printf("%v + %v = %v\n", args[0], args[1], result)
 		}
 	case "version":
-		fmt.Printf("go-calc %v\n", version)
+		fmt.Printf("go-calc %v %v\n", version, commit)
 	default:
 		illegalArguments()
 	}
