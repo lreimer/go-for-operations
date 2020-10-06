@@ -34,9 +34,11 @@ Make sure you have prepared your development environment properly.
 
 ## References
 
-- https://talks.golang.org/2012/splash.article
+- https://gobyexample.com
 - https://learnxinyminutes.com/docs/go/
+- https://goreleaser.com/quick-start/
 - https://github.com/spf13/cobra/blob/master/cobra/README.md
+- https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/
 - https://github.com/operator-framework/getting-started
 - https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md
 
