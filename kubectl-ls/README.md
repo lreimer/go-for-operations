@@ -3,7 +3,6 @@
 This demo shows how to create a simple Cobra CLI app to display and output
 a directory listing similar to `ls`. By following some naming conventions the
 application can be use as a `kubectl` plugin. Example usage:
-
 ```bash
 $ kubectl ls
 $ kubectl ls -l
