@@ -9,8 +9,11 @@ import (
 
 	"github.com/go-logr/logr"
 	v1 "k8s.io/api/apps/v1"
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -39,7 +42,6 @@ func (r *MicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.Info("Microservice resource not found. Deleting ...")
-			// delete all associated resources if required
 			return ctrl.Result{}, nil
 		}
 		logger.Error(err, "Failed to get Microservice.")
@@ -47,7 +49,84 @@ func (r *MicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	}
 
 	logger.Info("Reconcile Microservice.")
-	// add the update the associated service, deployment, ...
+	deployment := &v1.Deployment{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      microservice.Name,
+			Namespace: microservice.Namespace,
+			Labels:    microservice.Labels,
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					APIVersion: microservice.APIVersion,
+					Kind:       microservice.Kind,
+					Name:       microservice.Name,
+					UID:        microservice.UID,
+				},
+			},
+		},
+		Spec: v1.DeploymentSpec{
+			Replicas: &microservice.Spec.Replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: microservice.Labels,
+			},
+			Template: apiv1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: microservice.Labels,
+				},
+				Spec: apiv1.PodSpec{
+					Containers: []apiv1.Container{
+						{
+							Name:  "microservice",
+							Image: microservice.Spec.Image,
+							Ports: []apiv1.ContainerPort{
+								{
+									Name:          "http",
+									Protocol:      apiv1.ProtocolTCP,
+									ContainerPort: microservice.Spec.Ports[0],
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	error := r.Client.Create(context.TODO(), deployment, &client.CreateOptions{})
+	if error != nil {
+		logger.Error(nil, error.Error())
+	}
+
+	service := &apiv1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      microservice.Name,
+			Namespace: microservice.Namespace,
+			Labels:    microservice.Labels,
+			OwnerReferences: []metav1.OwnerReference{
+				{
+					APIVersion: microservice.APIVersion,
+					Kind:       microservice.Kind,
+					Name:       microservice.Name,
+					UID:        microservice.UID,
+				},
+			},
+		},
+		Spec: apiv1.ServiceSpec{
+			Selector: microservice.Labels,
+			Ports: []apiv1.ServicePort{
+				{
+					Name:       "http",
+					Port:       microservice.Spec.Ports[0],
+					TargetPort: intstr.FromString("http"),
+				},
+			},
+			Type: apiv1.ServiceTypeLoadBalancer,
+		},
+	}
+
+	error = r.Client.Create(context.TODO(), service, &client.CreateOptions{})
+	if error != nil {
+		logger.Error(nil, error.Error())
+	}
 
 	return ctrl.Result{}, nil
 }

@@ -5,7 +5,8 @@ This operator aims to make operations a lot easier by abstracting the usual
 `Microservice` custom resource. The operator will then manage the underlying
 Kubernetes resources automagically.
 
-:exclamation: This operator is just a demo. Currently the operator only creates a basic deployment and service object.
+:exclamation: This operator is just a demo. Currently the operator only creation and
+deletion of a deployment and service object.
 
 ```yaml
 apiVersion: apps.qaware.de/v1
