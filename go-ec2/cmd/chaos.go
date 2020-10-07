@@ -10,6 +10,7 @@ import (
 )
 
 var count int
+var tagged bool
 
 // chaosCmd represents the chaos command
 var chaosCmd = &cobra.Command{
@@ -25,16 +26,20 @@ var chaosCmd = &cobra.Command{
 		svc := ec2.New(sess)
 
 		// Call to get detailed information on each instance
-		filter := &ec2.DescribeInstancesInput{
-			Filters: []*ec2.Filter{
-				{
-					Name: aws.String("tag:ChaosEnabled"),
-					Values: []*string{
-						aws.String("true"),
+		var filter *ec2.DescribeInstancesInput = nil
+		if tagged {
+			filter = &ec2.DescribeInstancesInput{
+				Filters: []*ec2.Filter{
+					{
+						Name: aws.String("tag:ChaosEnabled"),
+						Values: []*string{
+							aws.String("true"),
+						},
 					},
 				},
-			},
+			}
 		}
+
 		result, err := svc.DescribeInstances(filter)
 		if err != nil {
 			fmt.Println("Error describing EC2 instances.", err)
@@ -73,5 +78,6 @@ var chaosCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(chaosCmd)
 
+	chaosCmd.Flags().BoolVarP(&tagged, "tagged", "t", false, "only tagged instances")
 	chaosCmd.Flags().IntVarP(&count, "count", "c", 1, "the EC2 chaos count")
 }
