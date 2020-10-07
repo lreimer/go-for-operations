@@ -39,11 +39,12 @@ $ curl https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/mast
 $ chmod +x setup-envtest.sh
 
 $ make install
+$ kubectl apply -f config/samples/apps_v1_microservice.yaml
+$ make run ENABLE_WEBHOOKS=false
+
 $ make docker-build docker-push
 $ make deploy
-
 $ k9s
-$ kubectl apply -f config/samples/apps_v1_microservice.yaml
 ```
 
 ## Creating the Microservice CRD
@@ -74,7 +75,34 @@ type MicroserviceSpec struct {
 
 ## Implement Reconcile Loop
 
+Finally, the reconcile loop needs to be implemented to apply the changes required to
+the current resource state.
 
+```golang
+// Reconcile loop to apply relevant changes to K8s
+func (r *MicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	ctx := context.Background()
+	logger := r.Log.WithValues("microservice", req.NamespacedName)
+
+	// lookup the Microservice instance for this reconcile request
+	microservice := &appsv1.Microservice{}
+	err := r.Get(ctx, req.NamespacedName, microservice)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			logger.Info("Microservice resource not found. Ignoring.")
+			// delete all associated resources if required
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Failed to get Microservice.")
+		return ctrl.Result{}, err
+	}
+
+	logger.Info("Reconcile Microservice.")
+	// add the update the associated service, deployment, ...
+
+	return ctrl.Result{}, nil
+}
+```
 
 ## References
 

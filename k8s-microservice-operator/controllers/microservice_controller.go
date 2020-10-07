@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-logr/logr"
 	v1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -29,10 +30,24 @@ type MicroserviceReconciler struct {
 
 // Reconcile loop to apply relevant changes to K8s
 func (r *MicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("microservice", req.NamespacedName)
+	ctx := context.Background()
+	logger := r.Log.WithValues("microservice", req.NamespacedName)
 
-	// your logic here
+	// lookup the Microservice instance for this reconcile request
+	microservice := &appsv1.Microservice{}
+	err := r.Get(ctx, req.NamespacedName, microservice)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			logger.Info("Microservice resource not found. Deleting ...")
+			// delete all associated resources if required
+			return ctrl.Result{}, nil
+		}
+		logger.Error(err, "Failed to get Microservice.")
+		return ctrl.Result{}, err
+	}
+
+	logger.Info("Reconcile Microservice.")
+	// add the update the associated service, deployment, ...
 
 	return ctrl.Result{}, nil
 }
