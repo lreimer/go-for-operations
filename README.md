@@ -8,7 +8,6 @@ especially in the Ops and Cloud-native domain. Docker, Kubernetes, Kubectl and m
 other known tools and infrastructure components are all implemented in Go.
 
 
-
 ## Prerequisites
 
 Make sure you have prepared your development environment properly.
@@ -38,6 +37,9 @@ Make sure you have prepared your development environment properly.
 - https://learnxinyminutes.com/docs/go/
 - https://goreleaser.com/quick-start/
 - https://github.com/spf13/cobra/blob/master/cobra/README.md
+- https://docs.aws.amazon.com/sdk-for-go/api/service/ec2/
+- https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/using-ec2-with-go-sdk.html
+- https://github.com/awsdocs/aws-doc-sdk-examples/tree/master/go/example_code/ec2
 - https://kubernetes.io/docs/tasks/extend-kubectl/kubectl-plugins/
 - https://github.com/operator-framework/getting-started
 - https://github.com/operator-framework/operator-sdk/blob/master/doc/user-guide.md
