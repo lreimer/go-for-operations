@@ -5,9 +5,11 @@ perform chaos monkey style operations on Kubernetes deployments and pods.
 
 Example usage:
 ```bash
-$ kubectl chaos --replicas 2 deployment/nginx
+$ kubectl apply -f nginx-deployment.yaml
+$ kubectl chaos nginx-deployment --replicas 2 --namespace default
+
 $ kubectl chaos --help
-$ kubectl chaos version
+$ kubectl chaos --version
 ```
 
 ## Initial application creation
@@ -25,3 +27,7 @@ $ kubectl chaos
 ```
 
 Add the `Makefile` and a `.goreleaser.yml` to build the binary distribution.
+
+## References
+
+- https://github.com/kubernetes/client-go

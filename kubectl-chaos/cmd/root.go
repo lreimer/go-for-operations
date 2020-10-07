@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -8,18 +9,86 @@ import (
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
+var version string
+var commit string
+
+var versionFlag bool
 var cfgFile string
+
+var replicas int
+var namespace string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kubectl-chaos [deployment/name]",
 	Short: "Perform chaos on your K8s deployments",
 	Long:  "Delete specified number of Pods for speficied deployments",
+	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		if versionFlag {
+			fmt.Printf("kubectl-chaos %v %v\n", version, commit)
+			return
+		}
 
+		loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
+		configOverrides := &clientcmd.ConfigOverrides{}
+		kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+
+		config, err := kubeConfig.ClientConfig()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		clientset, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Perform chaos on Kubernetes namespace", namespace)
+
+		deployment, err := clientset.AppsV1().Deployments(namespace).Get(context.TODO(), args[0], metav1.GetOptions{})
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		labelMap := deployment.Spec.Selector.MatchLabels
+
+		pods, err := clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
+			LabelSelector: labels.SelectorFromSet(labelMap).String(),
+		})
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		for i, p := range pods.Items {
+			if i >= replicas {
+				break
+			}
+			fmt.Println("Deleting pod", p.Name)
+			clientset.CoreV1().Pods(namespace).Delete(context.TODO(), p.Name, metav1.DeleteOptions{})
+		}
 	},
+}
+
+// SetVersion sets the application version for the root command
+func SetVersion(v string) {
+	version = v
+}
+
+// SetCommit sets the commit hash for the root command
+func SetCommit(c string) {
+	commit = c
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -36,7 +105,9 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.kubectl-chaos.yaml)")
 
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().IntVarP(&replicas, "replicas", "r", 1, "Number of replicas")
+	rootCmd.Flags().StringVarP(&namespace, "namespace", "n", "default", "the namespace to use")
+	rootCmd.Flags().BoolVarP(&versionFlag, "version", "v", false, "Display version info")
 }
 
 // initConfig reads in config file and ENV variables if set.
