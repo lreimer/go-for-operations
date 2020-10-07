@@ -17,13 +17,15 @@ The initial skaffolding of the Go project and CLI application skeleton is taken 
 of using the `cobra` CLI utility program.
 
 ```bash
-$ cobra init kubectl-ls --pkg-name ls --license MIT --author "Mario-Leander Reimer"
+$ cobra init kubectl-ls --pkg-name github.com/lreimer/go-for-operations/kubectl-ls --license MIT --author "Mario-Leander Reimer"
 $ cd kubectl-ls
 $ go mod init github.com/lreimer/go-for-operations/kubectl-ls
 
 $ go install
 $ kubectl ls
 ```
+
+Add the `Makefile` and a `.goreleaser.yml` to build the binary distribution.
 
 Open the generated `cmd/root.go` file, perform some cleanup and add the following code
 to execute when the command is run.
