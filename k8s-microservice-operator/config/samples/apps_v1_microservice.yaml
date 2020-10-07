@@ -1,0 +1,12 @@
+apiVersion: apps.qaware.de/v1
+kind: Microservice
+metadata:
+  name: microservice-sample
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  image: nginx:1.17.6
+  ports:
+    - 80
+  serviceType: LoadBalancer

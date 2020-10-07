@@ -1,0 +1,77 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.3.0
+  creationTimestamp: null
+  name: microservices.apps.qaware.de
+spec:
+  group: apps.qaware.de
+  names:
+    kind: Microservice
+    listKind: MicroserviceList
+    plural: microservices
+    singular: microservice
+  scope: Namespaced
+  subresources:
+    status: {}
+  validation:
+    openAPIV3Schema:
+      description: Microservice is the Schema for the microservices API
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: MicroserviceSpec defines the desired state of Microservice
+          properties:
+            image:
+              description: Image is the Docker image and tag to use for the microservice
+                deployment
+              type: string
+            ports:
+              description: Ports is the list of HTTP container ports for the microservice
+                deployment
+              items:
+                format: int32
+                type: integer
+              type: array
+            replicas:
+              description: Replicas is the number of replicas for the microservice
+                deployment
+              format: int32
+              minimum: 0
+              type: integer
+            serviceType:
+              description: ServiceType is the service type to use for the microservice
+                service
+              type: string
+          required:
+          - ports
+          type: object
+        status:
+          description: MicroserviceStatus defines the observed state of Microservice
+          type: object
+      type: object
+  version: v1
+  versions:
+  - name: v1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

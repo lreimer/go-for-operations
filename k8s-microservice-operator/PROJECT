@@ -1,0 +1,7 @@
+domain: qaware.de
+repo: github.com/lreimer/go-for-operations/k8s-microservice-operator
+resources:
+- group: apps
+  kind: Microservice
+  version: v1
+version: "2"
