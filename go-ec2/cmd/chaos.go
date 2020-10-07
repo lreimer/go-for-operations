@@ -25,7 +25,17 @@ var chaosCmd = &cobra.Command{
 		svc := ec2.New(sess)
 
 		// Call to get detailed information on each instance
-		result, err := svc.DescribeInstances(nil)
+		filter := &ec2.DescribeInstancesInput{
+			Filters: []*ec2.Filter{
+				{
+					Name: aws.String("tag:ChaosEnabled"),
+					Values: []*string{
+						aws.String("true"),
+					},
+				},
+			},
+		}
+		result, err := svc.DescribeInstances(filter)
 		if err != nil {
 			fmt.Println("Error describing EC2 instances.", err)
 			return
@@ -54,7 +64,7 @@ var chaosCmd = &cobra.Command{
 			if err != nil {
 				fmt.Println("Error terminating EC2 instance.", err)
 			} else {
-				fmt.Println("Terminated EC2 instance:", result.TerminatingInstances[0].InstanceId)
+				fmt.Println("Terminated EC2 instance:", *result.TerminatingInstances[0].InstanceId)
 			}
 		}
 	},
