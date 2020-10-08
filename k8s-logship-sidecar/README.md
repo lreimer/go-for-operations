@@ -22,10 +22,6 @@ func main() {
 }
 ```
 
-## Configuration Implementation
-
-TODO
-
 ## Building and Running
 
 ```bash
