@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
@@ -30,4 +31,13 @@ func main() {
 
 func scanForLogfiles() {
 	log.Printf("Scanning for files %v in %v", FilePattern, Directory)
+	files, err := ioutil.ReadDir(Directory)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, f := range files {
+		if !f.IsDir() {
+			log.Printf("Processing %v/%v %v %v", Directory, f.Name(), f.Size(), f.ModTime())
+		}
+	}
 }
