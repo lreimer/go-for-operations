@@ -67,6 +67,7 @@ Then, create a Cobra skeleton using the following commands:
 $ cobra init kubectl-chaos --pkg-name chaos --license MIT --author "<your name>"
 $ cd kubectl-chaos
 $ go mod init kubectl-chaos
+$ go mod tidy
 ```
 
 #### Add flag parsing
