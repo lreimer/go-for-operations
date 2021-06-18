@@ -8,13 +8,15 @@ You need the following tools for this workshop installed:
 - Git for pulling this repo
 - Editor with support for Go
     - Visual Studio Code with Go plugin
-    - IntelliJ IDEA with Go plugin
+    - IntelliJ IDEA with Go plugin 
     - JetBrains GoLand
 - Local Docker installation
     - Windows/Mac: https://docs.docker.com/engine/install/
     - Linux: https://get.docker.com/
 - Kubectl https://kubernetes.io/docs/tasks/tools/#kubectl
 - Minikube: https://minikube.sigs.k8s.io/docs/start/
+
+If you are using IntelliJ or Goland, don't forget to activate the Go Modules support. Go the Preferences, search for `go modules` and set the checkmark for `Enable Go Modules integration`. 
 
 ## Test your Go Runtime (10 min)
 
