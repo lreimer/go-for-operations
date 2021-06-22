@@ -1,6 +1,6 @@
 # Challenge 1 - Command line dev tools
 
-## Simple CLIs with plain Go (60 min)
+## Simple CLIs with plain Go (90 min)
 
 The Go base library has a lot of useful libraries, so we do not even need to search for a special library to create our first CLI.
 
@@ -67,7 +67,7 @@ Also, add a default case to handle wrong argument usage.
 Go to the folder `go-calc` and follow the steps of the [README](../../go-calc/README.md) if you need further help. The code in the folder works out-of-the-box and you can compare your solution with it.
 Depending on your knowledge level and how fast you are, you can additionally go through the `Testing Go Applications` and `Building Go Applications` parts. 
 
-## Complex CLIs need a Cobra (90 min)
+## Complex CLIs need a Cobra (120 min)
 
 There is way more to an CLI than command and flag parsing. A modern CLI should support auto-completion, global flags vs local flags, automatic config parsing, in-built documentation with help pages and more...
 That is a lot of boiler plate to implement by yourself for every CLI. That is why we need a battle-tested "framework" for CLIs that supports all these features. 

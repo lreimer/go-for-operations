@@ -11,3 +11,4 @@ other known tools and infrastructure components are all implemented in Go.
 
 1) [Challenge 0 - Setup the environment](./challenge-0/challenge-0.md)
 2) [Challenge 1 - Command line dev tools](./challenge-1/challenge-1.md)
+3) [Challenge 2 - Kubernetes sidecar](./challenge-2/challenge-2.md)

@@ -18,7 +18,7 @@ You need the following tools for this workshop installed:
 
 If you are using IntelliJ or Goland, don't forget to activate the Go Modules support. Go the Preferences, search for `go modules` and set the checkmark for `Enable Go Modules integration`. 
 
-## Test your Go Runtime (10 min)
+## Test your Go Runtime (15 min)
 
 1) Open your editor of choice
 
