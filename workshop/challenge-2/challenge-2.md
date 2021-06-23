@@ -1,4 +1,4 @@
-# Challenge 2 - Kubernetes sidecar with Go
+# Challenge 2 - Kubernetes sidecars with Go
 
 In this challenge, we will write a sidecar for Kubernetes in Go. A sidecar is a container that is a supplement to your application container inside your pod. The sidecar shares storage volumes, networking and other things with the application container, thus it can be used for intercepting traffic, sharing files with the application or adding monitoring. 
 
@@ -32,6 +32,25 @@ Create your main function that contains the log shipping loop.
 Use [time.Tick](https://golang.org/pkg/time/#Tick) with your scan interval variable as ticker (look at the example for sample usage) and call your logfile scanning method in the ticker loop. 
 The logfile scanning method should read all files in the log directory and print the file content of files that match the file pattern. For listing the files of a directory you can use `ioutil.ReadDir`. When looping through the files check if its a file using `file.IsDir` and use the pattern regex to find out if the pattern matches. To print the contents you can use [ioutil.ReadFile](https://golang.org/pkg/io/ioutil/#example_ReadFile).
 
+A log shipper should have graceful shutdown implemented. To do this in Go, we will use a Go routine that listens to the OS termination signal. 
+Integrate the following code in your main function:
+
+```golang
+	go func() {
+    // create channel with os.Signal type as listener for the SIGTERM and SIGINT syscalls
+		var gracefulStop = make(chan os.Signal, 1)
+		signal.Notify(gracefulStop, syscall.SIGTERM)
+		signal.Notify(gracefulStop, syscall.SIGINT)
+
+    // blocking wait for a termination signal
+		sig := <-gracefulStop
+		log.Println("Received stop signal:", sig)
+
+    // bonus: add handling here for sending remaining logs...
+		os.Exit(0)
+	}()
+```
+
 If you have problems, check the solution in the `k8s-logship-sidecar` in the root of the repo.
 
 ### Dockerize the sidecar
@@ -61,15 +80,16 @@ CMD [""]
 
 The advantage of the multi-stage docker build is that we have a smaller runtime image as the golang build tools are only needed for building the binary. 
 
-### Building and Running
+### Building the docker container
 
-Use the makefile and provided Dockerfile inside the `workshop/challenge-2` folder. 
+Use the provided Dockerfile inside the `workshop/challenge-2` folder. 
 
 ```bash
-$ make build
-$ make docker
+# to run the operator in minikube we need to configure the docker daemon to use the minikube context
+$ eval $(minikube -p minikube docker-env)
 
-$ docker run -it -v `pwd`:/logs k8s-logship-sidecar:v1.0.0
+# create the docker container
+$ docker build -t k8s-logship-sidecar:v1.0.0 .
 ```
 
 ### Deployment of log shipping sidecar with nginx 
@@ -134,5 +154,10 @@ $ kubectl apply -f nginx-deployment.yaml
 Now, you can check if the nginx logs are printed as logs of the sidecar with the following command:
 
 ```bash
-$ kubectl logs <nginx pod> -c logshipper
+$ kubectl logs <nginx pod> -c logshipper -f
+```
+
+Try making calls against the nginx to see if there is access logs:
+```bash
+curl $(minikube ip):$(kubectl get service nginx-service -o jsonpath="{.spec.ports[0].nodePort}")
 ```

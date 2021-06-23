@@ -31,6 +31,11 @@ Make sure you have prepared your development environment properly.
 4. Building a Sidecar container
 5. Building a Kubernetes Operator in Go
 
+## Workshop Challenge descriptions
+
+We created several challenges for you to go through that feature the outlined workshop topics. 
+Follow this [README](workshop/README.md) for instructions.
+
 ## References
 
 - https://gobyexample.com
@@ -47,6 +52,7 @@ Make sure you have prepared your development environment properly.
 ## Maintainer
 
 M.-Leander Reimer (@lreimer), <mario-leander.reimer@qaware.de>
+Markus Zimmermann (@markus_zm), <markus.zimmermann@qaware.de>
 
 ## License
 
