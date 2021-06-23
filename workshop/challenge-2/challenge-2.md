@@ -34,9 +34,36 @@ The logfile scanning method should read all files in the log directory and print
 
 If you have problems, check the solution in the `k8s-logship-sidecar` in the root of the repo.
 
+### Dockerize the sidecar
+
+Do deploy the sidecar alongside an application container, we need to build a docker container.
+Let's look at a multi-stage Dockerfile:
+```
+FROM golang:1.15.2 as builder # start with golang container as build image
+
+WORKDIR /build
+
+COPY . /build
+RUN make build # run make build to build the sidecar
+
+FROM gcr.io/distroless/static-debian10 # actual runtime base container  
+COPY --from=builder /build/k8s-logship-sidecar / # we copy the created binary to the runtime image
+
+# set default environment variables
+ENV LOG_DIRECTORY=/logs
+ENV LOG_FILE_PATTERN=.+.gz
+ENV LOG_SCAN_INTERVAL=10
+
+# configure entrypoint
+ENTRYPOINT ["/k8s-logship-sidecar"]
+CMD [""]
+```
+
+The advantage of the multi-stage docker build is that we have a smaller runtime image as the golang build tools are only needed for building the binary. 
+
 ### Building and Running
 
-Use the makefile and provided Dockerfile inside the ./challenge-2 folder. 
+Use the makefile and provided Dockerfile inside the `workshop/challenge-2` folder. 
 
 ```bash
 $ make build
