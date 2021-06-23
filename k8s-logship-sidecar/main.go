@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path"
 	"syscall"
 	"time"
 )
@@ -37,7 +38,15 @@ func scanForLogfiles() {
 	}
 	for _, f := range files {
 		if !f.IsDir() {
-			log.Printf("Processing %v/%v %v %v", Directory, f.Name(), f.Size(), f.ModTime())
+			if FilePattern.MatchString(f.Name()) {
+				log.Printf("Processing %v/%v %v %v", Directory, f.Name(), f.Size(), f.ModTime())
+				fileContents, err := ioutil.ReadFile(path.Join(Directory, f.Name()))
+				if err != nil {
+					log.Printf("Cannot read file %s with error: %s", f.Name(), err.Error())
+				} else {
+					log.Println(string(fileContents))
+				}
+			}
 		}
 	}
 }

@@ -1,0 +1,12 @@
+apiVersion: apps.example.com/v1
+kind: Microservice
+metadata:
+  name: microservice-sample
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  image: nginx:1.17.6
+  ports:
+    - 80
+  serviceType: NodePort
