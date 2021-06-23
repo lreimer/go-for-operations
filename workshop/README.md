@@ -11,7 +11,9 @@ other known tools and infrastructure components are all implemented in Go.
 
 1) [Challenge 0 - Setup the environment](./challenge-0/challenge-0.md)
 2) [Challenge 1 - Command line dev tools](./challenge-1/challenge-1.md)
-3) [Challenge 2 - Kubernetes sidecar](./challenge-2/challenge-2.md)
+3) [Challenge 2 - Kubernetes sidecars with Go](./challenge-2/challenge-2.md)
+3) [Challenge 3 - Microservice abstractions with Kubernetes Operators](./challenge-3/challenge-3.md)
+
 
 ## Helpful resources
 
@@ -35,6 +37,7 @@ other known tools and infrastructure components are all implemented in Go.
   - [log](https://golang.org/pkg/log/)
   - [os](https://golang.org/pkg/os/)
   - [os/signal](https://golang.org/pkg/os/signal/)
+  - [path](https://golang.org/pkg/path/)
   - [strconv](https://golang.org/pkg/strconv/)
   - [syscall](https://golang.org/pkg/syscall/)
   - [regexp](https://golang.org/pkg/regexp/)
