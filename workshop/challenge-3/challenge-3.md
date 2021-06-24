@@ -129,40 +129,40 @@ Modify the reconcile loop by changing the `Reconcile` function:
 // Reconcile loop to apply relevant changes to K8s
 func (r *MicroserviceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// lookup the Microservice instance for this reconcile request
-	microservice := &appsv1.Microservice{}
-	// build logger using controller-runtime package
-    logger := ctrl.Log.WithName("controllers").WithName("Microservice").WithValues("microservice", req.NamespacedName)
+  microservice := &appsv1.Microservice{}
+  // build logger using controller-runtime package
+  logger := ctrl.Log.WithName("controllers").WithName("Microservice").WithValues("microservice", req.NamespacedName)
 
-    err := r.Get(ctx, req.NamespacedName, microservice)
-	if err != nil {
-        if errors.IsNotFound(err) { // import "k8s.io/apimachinery/pkg/api/errors"
-            logger.Info("Microservice resource not found. Ignoring.")
-            // delete all associated resources created for the microservice
-            return ctrl.Result{}, nil
-        }
-		logger.Error(err, "Failed to get Microservice.")
-		return ctrl.Result{}, err
-	}
+  err := r.Get(ctx, req.NamespacedName, microservice)
+  if err != nil {
+    if errors.IsNotFound(err) { // import "k8s.io/apimachinery/pkg/api/errors"
+        logger.Info("Microservice resource not found. Ignoring.")
+        // delete all associated resources created for the microservice
+        return ctrl.Result{}, nil
+    }
+    logger.Error(err, "Failed to get Microservice.")
+    return ctrl.Result{}, err
+  }
 
-	logger.Info("Reconcile Microservice.")
-	// add the update the associated service, deployment, ...
+  logger.Info("Reconcile Microservice.")
+  // add the update the associated service, deployment, ...
   deployment := &v1.Deployment{} // fill the structure with the field of our Microservice resource; your IDE can help you with filling the structure
-  
+
   // create the deployment resource
   err = r.Client.Create(context.TODO(), deployment, &client.CreateOptions{})
-	if err != nil {
-		logger.Error(err, "error with deployment resource")
-	}
+  if err != nil {
+    logger.Error(err, "error with deployment resource")
+  }
 
   service := &apiv1.Service{} // fill the structure with the field of our Microservice resource; your IDE can help you with filling the structure
 
   // create the service resource
   err = r.Client.Create(context.TODO(), service, &client.CreateOptions{})
-	if err != nil {
-		logger.Error(err, "error with service resource")
-	}
+  if err != nil {
+    logger.Error(err, "error with service resource")
+  }
 
-	return ctrl.Result{}, nil
+  return ctrl.Result{}, nil
 }
 ```
 
