@@ -1,7 +1,19 @@
 domain: qaware.de
-repo: github.com/lreimer/go-for-operations/k8s-microservice-operator
+layout:
+- go.kubebuilder.io/v3
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: k8s-microservice-operator
+repo: github.com/qaware/k8s-microservice-operator
 resources:
-- group: apps
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: qaware.de
+  group: apps
   kind: Microservice
+  path: github.com/qaware/k8s-microservice-operator/api/v1
   version: v1
-version: "2"
+version: "3"

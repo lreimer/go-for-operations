@@ -49,15 +49,15 @@ On other systems follow this guide: https://v1-2-x.sdk.operatorframework.io/docs
 To create the operator skeleton, we will use the Operator SDK.
 
 ```bash
-$ mkdir k8s-microservice-operator
-$ cd k8s-microservice-operator
+mkdir k8s-microservice-operator
+cd k8s-microservice-operator
 
 # we will use as domain example.com but you can replace it if you like
 # API groups will be <group>.example.com
-$ operator-sdk init --domain example.com --repo k8s-microservice-operator
+operator-sdk init --domain example.com --repo k8s-microservice-operator
 
 # now we create our API for the Microservice custom resource
-$ operator-sdk create api --group apps --version v1 --kind Microservice --resource --controller
+operator-sdk create api --group apps --version v1 --kind Microservice --resource --controller
 ```
 
 ### Creating the Microservice CRD
@@ -97,30 +97,72 @@ Once done, run `make generate` and `make manifests`. This is necessary to regene
 Finally, the reconcile loop needs to be implemented to apply the changes required to
 the current resource state. The reconcile loop is in the controller generated for for the API called `microservice_controller.go`. There in the `SetupWithManager` function, it already watches for the `Microservice` resource.
 
+Add the following imports (some are already there, some are needed for the reconcile loop code we add below):
+```golang
+import (
+	"context"
+
+	v1 "k8s.io/api/apps/v1"
+	apiv1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"k8s.io/apimachinery/pkg/runtime"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	appsv1 "github.com/qaware/k8s-microservice-operator/api/v1"
+)
+```
+
 Modify the reconcile loop by changing the `Reconcile` function:
 ```golang
+...
+// RBAC annotations necessary for the operator service account to access the resources we want to create/listen to
+//+kubebuilder:rbac:groups=apps.example.com,resources=microservices,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps.example.com,resources=microservices/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=apps.example.com,resources=microservices/finalizers,verbs=update
+//+kubebuilder:rbac:groups="apps",resources=deployments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
+
 // Reconcile loop to apply relevant changes to K8s
 func (r *MicroserviceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	// lookup the Microservice instance for this reconcile request
-	microservice := &appsv1.Microservice{}
-	// build logger using controller-runtime package
-    logger := ctrl.Log.WithName("controllers").WithName("Microservice").WithValues("microservice", req.NamespacedName)
+  microservice := &appsv1.Microservice{}
+  // build logger using controller-runtime package
+  logger := ctrl.Log.WithName("controllers").WithName("Microservice").WithValues("microservice", req.NamespacedName)
 
-    err := r.Get(ctx, req.NamespacedName, microservice)
-	if err != nil {
-        if errors.IsNotFound(err) { // import "k8s.io/apimachinery/pkg/api/errors"
-            logger.Info("Microservice resource not found. Ignoring.")
-            // delete all associated resources created for the microservice
-            return ctrl.Result{}, nil
-        }
-		logger.Error(err, "Failed to get Microservice.")
-		return ctrl.Result{}, err
-	}
+  err := r.Get(ctx, req.NamespacedName, microservice)
+  if err != nil {
+    if errors.IsNotFound(err) { // import "k8s.io/apimachinery/pkg/api/errors"
+        logger.Info("Microservice resource not found. Ignoring.")
+        // delete all associated resources created for the microservice
+        return ctrl.Result{}, nil
+    }
+    logger.Error(err, "Failed to get Microservice.")
+    return ctrl.Result{}, err
+  }
 
-	logger.Info("Reconcile Microservice.")
-	// add the update the associated service, deployment, ...
+  logger.Info("Reconcile Microservice.")
+  // add the update the associated service, deployment, ...
+  deployment := &v1.Deployment{} // fill the structure with the field of our Microservice resource; your IDE can help you with filling the structure
 
-	return ctrl.Result{}, nil
+  // create the deployment resource
+  err = r.Client.Create(context.TODO(), deployment, &client.CreateOptions{})
+  if err != nil {
+    logger.Error(err, "error with deployment resource")
+  }
+
+  service := &apiv1.Service{} // fill the structure with the field of our Microservice resource; your IDE can help you with filling the structure
+
+  // create the service resource
+  err = r.Client.Create(context.TODO(), service, &client.CreateOptions{})
+  if err != nil {
+    logger.Error(err, "error with service resource")
+  }
+
+  return ctrl.Result{}, nil
 }
 ```
 
@@ -134,13 +176,13 @@ Ensure that minikube is still running.
 Run the following commands for deploying the operator:
 ```bash
 # installs custom resource definitions
-$ make install
+make install
 
 # to run the operator in minikube we need to configure the docker daemon to use the minikube context
-$ eval $(minikube -p minikube docker-env)
+eval $(minikube -p minikube docker-env)
 
 # builds docker image and deploys operator
-$ make IMG=controller:v1 docker-build deploy
+make IMG=controller:v1 docker-build deploy
 ```
 
 We will also need to create a sample microservice custom resource:

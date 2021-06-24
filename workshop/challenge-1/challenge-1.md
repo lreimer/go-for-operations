@@ -11,9 +11,9 @@ To initialize a go project, one needs to create a go module. The `go.mod` file d
 
 Execute the following commands to initialize the go module and create the necessary go code files which we fill in the next step.
 ```
-$ go mod init go-calc
-$ touch main.go
-$ touch calc.go
+go mod init go-calc
+touch main.go
+touch calc.go
 ```
 ### Exercise: Create a calculator
 
@@ -119,10 +119,10 @@ To quickly generate all needed CLI code, we use the scaffolding CLI of Cobra. In
 
 Then, create a Cobra skeleton using the following commands:
 ```bash
-$ cobra init kubectl-chaos --pkg-name chaos --license MIT --author "<your name>"
-$ cd kubectl-chaos
-$ go mod init kubectl-chaos
-$ go mod tidy
+cobra init kubectl-chaos --pkg-name kubectl-chaos --license MIT --author "<your name>"
+cd kubectl-chaos
+go mod init kubectl-chaos
+go mod tidy
 ```
 
 #### Writing commands 
