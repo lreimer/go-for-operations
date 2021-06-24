@@ -26,6 +26,28 @@ LOG_SCAN_INTERVAL # scanning interval in seconds / example: "10"
 
 Your code needs to read the environment variables and store them in Go variables. Put the config parsing in `config.go`. Use the `os` library to lookup environment, choose appropriate Go types for the variables. For the scan interval, use `time.Duration`. The log directory should be created if it does not exist. The file pattern should be stored as regex - use the `regexp` library. Store these variables as global variables. 
 
+One example, the LOG_DIRECTORY environment variable, to help you get started:
+```golang
+// Directory to watch for changes
+var Directory = logDirectory()
+
+func logDirectory() string {
+	name, ok := os.LookupEnv("LOG_DIRECTORY")
+	if !ok || len(name) == 0 {
+		log.Fatal("LOG_DIRECTORY environment variable not set.")
+	}
+
+	// Create the directory if it does not exist
+	if _, err := os.Stat(name); os.IsNotExist(err) {
+		os.Mkdir(name, os.ModePerm)
+	}
+
+	return name
+}
+```
+
+Define the other two in the same way by creating a var which gets the method assigned that reads out the environment variable. 
+
 ### The main execution
 
 Create your main function that contains the log shipping loop.
@@ -50,6 +72,35 @@ Integrate the following code in your main function:
 		os.Exit(0)
 	}()
 ```
+
+The tick loop is implemented as followed:
+```golang
+	tick := time.Tick(ScanInterval)
+	for range tick {
+		scanForLogfiles()
+	}
+```
+The `time.Tick` method returns an endless channel which sends a message on the channel on every interval.
+
+Now implement the `scanForLogfiles()` method.
+
+```golang
+func scanForLogfiles() {
+	log.Printf("Scanning for files %v in %v", FilePattern, Directory)
+	files, err := ioutil.ReadDir(Directory)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, f := range files {
+    // for every file:
+    // check if its a real file using `f.IsDir` and if it matches the FilePattern (try the MatchString method):
+    // read out the contents using `ioutil.ReadFile and print them to the stdout
+		// ...
+	}
+}
+
+```
+
 
 If you have problems, check the solution in the `k8s-logship-sidecar` in the root of the repo.
 
@@ -86,10 +137,10 @@ Use the provided Dockerfile inside the `workshop/challenge-2` folder.
 
 ```bash
 # to run the operator in minikube we need to configure the docker daemon to use the minikube context
-$ eval $(minikube -p minikube docker-env)
+eval $(minikube -p minikube docker-env)
 
 # create the docker container
-$ docker build -t k8s-logship-sidecar:v1.0.0 .
+docker build -t k8s-logship-sidecar:v1.0.0 .
 ```
 
 ### Deployment of log shipping sidecar with nginx 
@@ -148,13 +199,13 @@ spec:
 Deploy it with the following command (use the supplied nginx-deployment.yaml):
 
 ```bash
-$ kubectl apply -f nginx-deployment.yaml
+kubectl apply -f nginx-deployment.yaml
 ```
 
 Now, you can check if the nginx logs are printed as logs of the sidecar with the following command:
 
 ```bash
-$ kubectl logs <nginx pod> -c logshipper -f
+kubectl logs <nginx pod> -c logshipper -f
 ```
 
 Try making calls against the nginx to see if there is access logs:
